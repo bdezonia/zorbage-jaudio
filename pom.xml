@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>nom.bdezonia.zorbage</groupId>
+  <artifactId>zorbage-java-audio</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>zorbage-java-audio</name>
+  <description>Project for loading java audio library data into zorbage for further processing</description>
+
+  <developers>
+    <developer>
+      <id>bdezonia</id>
+      <name>Barry DeZonia</name>
+      <url>https://github.com/User:bdezonia</url>
+      <roles>
+        <role>founder</role>
+        <role>lead</role>
+        <role>developer</role>
+        <role>debugger</role>
+        <role>reviewer</role>
+        <role>support</role>
+        <role>maintainer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.github.bdezonia</groupId>
+      <artifactId>zorbage</artifactId>
+      <version>2.0.2</version>
+    </dependency>
+  
+  </dependencies>
+
+</project>
