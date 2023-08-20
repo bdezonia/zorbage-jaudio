@@ -38,6 +38,8 @@ import nom.bdezonia.zorbage.coordinates.LinearNdCoordinateSpace;
 import nom.bdezonia.zorbage.data.DimensionedDataSource;
 import nom.bdezonia.zorbage.data.DimensionedStorage;
 import nom.bdezonia.zorbage.sampling.IntegerIndex;
+import nom.bdezonia.zorbage.type.integer.int128.SignedInt128Member;
+import nom.bdezonia.zorbage.type.integer.int128.UnsignedInt128Member;
 import nom.bdezonia.zorbage.type.integer.int16.SignedInt16Member;
 import nom.bdezonia.zorbage.type.integer.int16.UnsignedInt16Member;
 import nom.bdezonia.zorbage.type.integer.int32.SignedInt32Member;
@@ -236,6 +238,10 @@ public class ZJAudio {
 				
 				return new SignedInt64Member();
 			
+			else if (bitsPerSample <= 128)
+				
+				return new SignedInt128Member();
+			
 			else
 				throw new IllegalArgumentException("bits per sample is weird! "+bitsPerSample);
 		}
@@ -258,6 +264,10 @@ public class ZJAudio {
 			else if (bitsPerSample <= 64)
 				
 				return new UnsignedInt64Member();
+			
+			else if (bitsPerSample <= 128)
+				
+				return new UnsignedInt128Member();
 			
 			else
 				throw new IllegalArgumentException("bits per sample is weird! "+bitsPerSample);
@@ -300,6 +310,9 @@ public class ZJAudio {
 		if (type instanceof SignedInt64Member)
 			data = DimensionedStorage.allocate(G.INT64.construct(), dims);
 		
+		if (type instanceof SignedInt128Member)
+			data = DimensionedStorage.allocate(G.INT128.construct(), dims);
+		
 		if (type instanceof UnsignedInt8Member)
 			data = DimensionedStorage.allocate(G.UINT8.construct(), dims);
 		
@@ -311,6 +324,9 @@ public class ZJAudio {
 		
 		if (type instanceof UnsignedInt64Member)
 			data = DimensionedStorage.allocate(G.UINT64.construct(), dims);
+		
+		if (type instanceof UnsignedInt128Member)
+			data = DimensionedStorage.allocate(G.UINT128.construct(), dims);
 		
 		if (type instanceof Float32Member)
 			data = DimensionedStorage.allocate(G.FLT.construct(), dims);
@@ -378,7 +394,7 @@ public class ZJAudio {
 				MAX = MAX.shiftLeft(8).add( BigInteger.valueOf(255) );
 			}
 
-			double y = (1.0 * number.doubleValue()) / MAX.doubleValue();
+			double y = number.doubleValue() / MAX.doubleValue();
 			
 			Float64Member value = G.DBL.construct();
 			
@@ -392,7 +408,7 @@ public class ZJAudio {
 			
 			if (y < cutoff) {
 				
-				calculation = y * ((1.0 + Math.log(A)) / A);
+				calculation = y * (magic_constant / A);
 			}
 			else {
 
@@ -466,6 +482,14 @@ public class ZJAudio {
 				
 				((DimensionedDataSource<SignedInt64Member>) data).set(idx, value);
 			}
+			else if (bitsPerSample <= 128) {
+				
+				SignedInt128Member value = G.INT128.construct();
+				
+				value.setV(number);
+				
+				((DimensionedDataSource<SignedInt128Member>) data).set(idx, value);
+			}
 			else
 				throw new IllegalArgumentException("bits per sample is weird! "+bitsPerSample);
 		}
@@ -505,6 +529,14 @@ public class ZJAudio {
 				
 				((DimensionedDataSource<UnsignedInt64Member>) data).set(idx, value);
 			}
+			else if (bitsPerSample <= 128) {
+				
+				UnsignedInt128Member value = G.UINT128.construct();
+				
+				value.setV(number);
+				
+				((DimensionedDataSource<UnsignedInt128Member>) data).set(idx, value);
+			}
 			else
 				throw new IllegalArgumentException("bits per sample is weird! "+bitsPerSample);
 		}
@@ -530,7 +562,7 @@ public class ZJAudio {
 				MAX = MAX.shiftLeft(8).add( BigInteger.valueOf(255) );
 			}
 
-			double y = (1.0 * number.doubleValue()) / MAX.doubleValue();
+			double y = number.doubleValue() / MAX.doubleValue();
 			
 			Float64Member value = G.DBL.construct();
 			
