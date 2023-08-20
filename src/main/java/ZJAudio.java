@@ -53,15 +53,19 @@ import nom.bdezonia.zorbage.type.real.float64.Float64Member;
 
 // TODO
 // - support MIDI files and Rich Media Format files
-// - make sure my A Law and Mu Law y percentage calcs are correct.
+// - make sure my A Law and Mu Law y percentage calcs are correct
+//     (number.doubleValue() / MAX.doubleValue()).
 //     Maybe the code is wrong how it is.
+//     Also besides a y percentage maybe we mult by y original range?
 // - break out from the main() into a class with static members
 // - support the DataBundle approach
-// - save metadata from audi file into DimensionedDataSource basic
+// - save metadata from audio file into DimensionedDataSource basic
 //     or extended metadata.
 // - make the pom like all the other projects
 // - deploy the project to maven central
 // - add to zorbage viewer
+// - compare results between zorbage viewer and some audio program
+//     using the same WAV files.
 
 public class ZJAudio {
 
