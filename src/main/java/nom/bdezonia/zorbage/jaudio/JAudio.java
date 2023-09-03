@@ -1,5 +1,5 @@
 /*
- * zorbage-java-audio: code for using the java sound api to open audio files into zorbage data structures for further processing
+ * zorbage-jaudio: code for using the java sound api to open audio files into zorbage data structures for further processing
  *
  * Copyright (C) 2023 Barry DeZonia
  * 
@@ -21,6 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package nom.bdezonia.zorbage.jaudio;
+
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -37,6 +39,7 @@ import nom.bdezonia.zorbage.coordinates.CoordinateSpace;
 import nom.bdezonia.zorbage.coordinates.LinearNdCoordinateSpace;
 import nom.bdezonia.zorbage.data.DimensionedDataSource;
 import nom.bdezonia.zorbage.data.DimensionedStorage;
+import nom.bdezonia.zorbage.misc.DataBundle;
 import nom.bdezonia.zorbage.sampling.IntegerIndex;
 import nom.bdezonia.zorbage.type.integer.int128.SignedInt128Member;
 import nom.bdezonia.zorbage.type.integer.int128.UnsignedInt128Member;
@@ -52,13 +55,10 @@ import nom.bdezonia.zorbage.type.real.float32.Float32Member;
 import nom.bdezonia.zorbage.type.real.float64.Float64Member;
 
 // TODO
-// - support MIDI files and Rich Media Format files
 // - make sure my A Law and Mu Law y percentage calcs are correct
 //     (number.doubleValue() / MAX.doubleValue()).
 //     Maybe the code is wrong how it is.
 //     Also besides a y percentage maybe we mult by y original range?
-// - break out from the main() into a class with static members
-// - support the DataBundle approach
 // - save metadata from audio file into DimensionedDataSource basic
 //     or extended metadata.
 // - make the pom like all the other projects
@@ -67,30 +67,24 @@ import nom.bdezonia.zorbage.type.real.float64.Float64Member;
 // - compare results between zorbage viewer and some audio program
 //     using the same WAV files.
 
-public class ZJAudio {
+// The java.sound spec supports WAV, AU, and AIFF file formats
+//   And various encodings of these formats
+//   And also MIDI and RMF (Rich Media Format) files (which I'm not handling yet)
+
+public class JAudio {
 
 	// do not instantiate
 	
-	private ZJAudio() { }
+	private JAudio() { }
 
-	// The java.sound spec supports WAV, AU, and AIFF file formats
-	//   And various encodings of these formats
-	//   And also MIDI and RMF (Rich Media Format) files
-	
-	// don't forget MidiFiles/Sequences from java.sound.midi
+	@SuppressWarnings("unchecked")
+	public static DataBundle read(String filename) {
 
-	public static void main(String[] args) {
-		
-		// make multidim dataset with time and channels
-		
-		// set the scale of the time axis
-		
-		// iterate the file and set all the channels at each time point
-		//   to the pixels read at that time point in the file
+		DataBundle bundle = new DataBundle();
 		
 		try {
 			
-			File file = new File("/opt/zoom/sip/dtmf_0.wav");
+			File file = new File(filename);
 
 			AudioInputStream ais = AudioSystem.getAudioInputStream(file);
 
@@ -111,6 +105,7 @@ public class ZJAudio {
 			int bitsPerSample = af.getSampleSizeInBits();
 			
 			Encoding encoding = af.getEncoding();
+
 			Object type = findType(encoding, bitsPerSample);
 			
 			DimensionedDataSource<?> data =
@@ -132,6 +127,9 @@ public class ZJAudio {
 			
 			int bytesPerSample = bitsPerSample / 8 + (bitsPerSample % 8 == 0 ? 0 : 1);
 			
+			// iterate the file and set all the channels at each time point
+			//   to the pixels read at that time point in the file
+
 			byte[] bytes;
 			
 			for (long f = 0; f < numFrames; f++) {
@@ -174,19 +172,100 @@ public class ZJAudio {
 			System.out.println("frame size = "+frameSize);
 
 			System.out.println("bytes per sample = "+bytesPerSample);
-
+			
+			if (type instanceof Float32Member) {
+				
+				bundle.flts.add((DimensionedDataSource<Float32Member>)data);
+			}
+			
+			if (type instanceof Float64Member) {
+				
+				bundle.dbls.add((DimensionedDataSource<Float64Member>)data);
+			}
+			
+			if (type instanceof SignedInt8Member) {
+				
+				bundle.int8s.add((DimensionedDataSource<SignedInt8Member>)data);
+			}
+			
+			if (type instanceof SignedInt16Member) {
+				
+				bundle.int16s.add((DimensionedDataSource<SignedInt16Member>)data);
+			}
+			
+			if (type instanceof SignedInt32Member) {
+				
+				bundle.int32s.add((DimensionedDataSource<SignedInt32Member>)data);
+			}
+			
+			if (type instanceof SignedInt64Member) {
+				
+				bundle.int64s.add((DimensionedDataSource<SignedInt64Member>)data);
+			}
+			
+			if (type instanceof SignedInt128Member) {
+				
+				bundle.int128s.add((DimensionedDataSource<SignedInt128Member>)data);
+			}
+			
+			if (type instanceof UnsignedInt8Member) {
+				
+				bundle.uint8s.add((DimensionedDataSource<UnsignedInt8Member>)data);
+			}
+			
+			if (type instanceof UnsignedInt16Member) {
+				
+				bundle.uint16s.add((DimensionedDataSource<UnsignedInt16Member>)data);
+			}
+			
+			if (type instanceof UnsignedInt32Member) {
+				
+				bundle.uint32s.add((DimensionedDataSource<UnsignedInt32Member>)data);
+			}
+			
+			if (type instanceof UnsignedInt64Member) {
+				
+				bundle.uint64s.add((DimensionedDataSource<UnsignedInt64Member>)data);
+			}
+			
+			if (type instanceof UnsignedInt128Member) {
+				
+				bundle.uint128s.add((DimensionedDataSource<UnsignedInt128Member>)data);
+			}
+			
+			// else what the hell is it? maybe throw an exception?
+		
 		} catch (IOException e) {
 		
-			System.out.println(e.getMessage());
-			
-			System.exit(1);
+			throw new IllegalArgumentException(e.getMessage());
 
 		} catch (UnsupportedAudioFileException e) {
 			
-			System.out.println(e.getMessage());
+			throw new IllegalArgumentException(e.getMessage());
+		}
+
+		return bundle;
+	}
+
+	public static void main(String[] args) {
+		
+		if (args.length != 1) {
+			
+			System.out.println("must pass one WAV/AU/AIFF file name as a command line argument");
 			
 			System.exit(1);
 		}
+
+		DataBundle bundle = read(args[0]);
+		
+		if (bundle.bundle().size() == 0) {
+			
+			System.out.println("file not read");
+			
+			System.exit(2);
+		}
+
+		System.out.println("file " + args[0] + " read");
 		
 		System.exit(0);
 	}
@@ -300,6 +379,10 @@ public class ZJAudio {
 	
 			allocateData(Object type, long[] dims, double secondsPerFrame)
 	{
+		// make multidim dataset with time and channels
+		
+		// set the scale of the time axis
+		
 		DimensionedDataSource<?> data = null;
 		
 		if (type instanceof SignedInt8Member)
