@@ -56,11 +56,11 @@ import nom.bdezonia.zorbage.type.real.float64.Float64Member;
 
 // TODO
 // - make sure my A Law and Mu Law y percentage calcs are correct
-//     (number.doubleValue() / MAX.doubleValue()).
-//     Maybe the code is wrong how it is.
+//     abs(number.doubleValue() / MAX.doubleValue()).
+//     Maybe the code is wrong how it is. Maybe it is a twos complement
+//     approach I am not taking. I am treating number as a fraction of
+//     MAX e.g. number as an unsigned number with a sign bit.
 //     Also besides a y percentage maybe we mult by y original range?
-// - save metadata from audio file into DimensionedDataSource basic
-//     or extended metadata.
 // - make the pom like all the other projects
 // - deploy the project to maven central
 // - add to zorbage viewer
@@ -96,10 +96,8 @@ public class JAudio {
 			
 			int numChannels = af.getChannels();
 
-			long[] dims = new long[] {numFrames, numChannels};
+			long[] dims = new long[] {numChannels, numFrames};
 			
-			// determine reader type
-
 			// determine pixel type
 			
 			int bitsPerSample = af.getSampleSizeInBits();
@@ -134,12 +132,14 @@ public class JAudio {
 			
 			for (long f = 0; f < numFrames; f++) {
 
-				idx.set(0, f);
+				idx.set(1, f);
 				
 				for (long c = 0; c < numChannels; c++) {
 					
-					idx.set(1, c);
+					idx.set(0, c);
 					
+					// determine how to read a value
+
 					bytes = ais.readNBytes(frameSize);
 					
 					if (!bigEndian) {
@@ -152,85 +152,87 @@ public class JAudio {
 						
 						bytes = reversedBytes;
 					}
+
+					// use metadata to correctly write the data to our structures
 					
 					setSample(data, idx, bytes, encoding, bitsPerSample);
 				}
 			}
 
-			System.out.println("Success!");
+			// store some metadata
 			
-			System.out.println("num frames = "+numFrames);
+			data.metadata().putLong("number of channels", numChannels);
 			
-			System.out.println("num channels = "+numChannels);
+			data.metadata().putLong("number of frames", numFrames);
 			
-			System.out.println("bits per sample = "+bitsPerSample);
+			data.metadata().putLong("frameSize", frameSize);
 			
-			System.out.println("Encoding is: "+encoding);
+			data.metadata().putInt("bits per sample", bitsPerSample);
 
-			System.out.println("big endian = "+bigEndian);
-			
-			System.out.println("frame size = "+frameSize);
+			data.metadata().putInt("bytes per sample", bytesPerSample);
 
-			System.out.println("bytes per sample = "+bytesPerSample);
+			data.metadata().putString("encoding", encoding.toString());
+
+			// now store the read data into the DataBundle
 			
 			if (type instanceof Float32Member) {
 				
-				bundle.flts.add((DimensionedDataSource<Float32Member>)data);
+				bundle.flts.add( (DimensionedDataSource<Float32Member>) data );
 			}
 			
 			if (type instanceof Float64Member) {
 				
-				bundle.dbls.add((DimensionedDataSource<Float64Member>)data);
+				bundle.dbls.add( (DimensionedDataSource<Float64Member>) data );
 			}
 			
 			if (type instanceof SignedInt8Member) {
 				
-				bundle.int8s.add((DimensionedDataSource<SignedInt8Member>)data);
+				bundle.int8s.add( (DimensionedDataSource<SignedInt8Member>) data );
 			}
 			
 			if (type instanceof SignedInt16Member) {
 				
-				bundle.int16s.add((DimensionedDataSource<SignedInt16Member>)data);
+				bundle.int16s.add( (DimensionedDataSource<SignedInt16Member>) data );
 			}
 			
 			if (type instanceof SignedInt32Member) {
 				
-				bundle.int32s.add((DimensionedDataSource<SignedInt32Member>)data);
+				bundle.int32s.add( (DimensionedDataSource<SignedInt32Member>) data );
 			}
 			
 			if (type instanceof SignedInt64Member) {
 				
-				bundle.int64s.add((DimensionedDataSource<SignedInt64Member>)data);
+				bundle.int64s.add( (DimensionedDataSource<SignedInt64Member>) data );
 			}
 			
 			if (type instanceof SignedInt128Member) {
 				
-				bundle.int128s.add((DimensionedDataSource<SignedInt128Member>)data);
+				bundle.int128s.add( (DimensionedDataSource<SignedInt128Member>) data );
 			}
 			
 			if (type instanceof UnsignedInt8Member) {
 				
-				bundle.uint8s.add((DimensionedDataSource<UnsignedInt8Member>)data);
+				bundle.uint8s.add( (DimensionedDataSource<UnsignedInt8Member>) data );
 			}
 			
 			if (type instanceof UnsignedInt16Member) {
 				
-				bundle.uint16s.add((DimensionedDataSource<UnsignedInt16Member>)data);
+				bundle.uint16s.add( (DimensionedDataSource<UnsignedInt16Member>) data );
 			}
 			
 			if (type instanceof UnsignedInt32Member) {
 				
-				bundle.uint32s.add((DimensionedDataSource<UnsignedInt32Member>)data);
+				bundle.uint32s.add( (DimensionedDataSource<UnsignedInt32Member>) data );
 			}
 			
 			if (type instanceof UnsignedInt64Member) {
 				
-				bundle.uint64s.add((DimensionedDataSource<UnsignedInt64Member>)data);
+				bundle.uint64s.add( (DimensionedDataSource<UnsignedInt64Member>) data );
 			}
 			
 			if (type instanceof UnsignedInt128Member) {
 				
-				bundle.uint128s.add((DimensionedDataSource<UnsignedInt128Member>)data);
+				bundle.uint128s.add( (DimensionedDataSource<UnsignedInt128Member>) data );
 			}
 			
 			// else what the hell is it? maybe throw an exception?
@@ -260,7 +262,7 @@ public class JAudio {
 		
 		if (bundle.bundle().size() == 0) {
 			
-			System.out.println("file not read");
+			System.out.println("file " + args[0] + " NOT read");
 			
 			System.exit(2);
 		}
@@ -303,7 +305,7 @@ public class JAudio {
 		}
 		else if (encoding == Encoding.PCM_SIGNED) {
 
-			// signed 8 or 16 or 24 or 32 up to 64 bit
+			// signed 8 or 16 or 24 or 32 up to 128 bit
 			
 			if (bitsPerSample >= 1 && bitsPerSample <= 8)
 				
@@ -330,7 +332,7 @@ public class JAudio {
 		}
 		else if (encoding == Encoding.PCM_UNSIGNED) {
 
-			// unsigned 8 or 16 or 24 or 32 up to 64 bit
+			// unsigned 8 or 16 or 24 or 32 up to 128 bit
 			
 			if (bitsPerSample >= 1 && bitsPerSample <= 8)
 				
@@ -381,8 +383,6 @@ public class JAudio {
 	{
 		// make multidim dataset with time and channels
 		
-		// set the scale of the time axis
-		
 		DimensionedDataSource<?> data = null;
 		
 		if (type instanceof SignedInt8Member)
@@ -431,6 +431,8 @@ public class JAudio {
 		data.setAxisType(1, "channel");
 		data.setAxisUnit(1, "number");
 
+		// set the scale of the time axis
+		
 		CoordinateSpace cs = new LinearNdCoordinateSpace(
 									new BigDecimal[] {BigDecimal.valueOf(secondsPerFrame), BigDecimal.ONE},
 									new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO});
