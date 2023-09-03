@@ -55,13 +55,13 @@ import nom.bdezonia.zorbage.type.real.float32.Float32Member;
 import nom.bdezonia.zorbage.type.real.float64.Float64Member;
 
 // TODO
+// - should I keep each channel as a separate data set in the bundle?
 // - make sure my A Law and Mu Law y percentage calcs are correct
 //     abs(number.doubleValue() / MAX.doubleValue()).
 //     Maybe the code is wrong how it is. Maybe it is a twos complement
 //     approach I am not taking. I am treating number as a fraction of
 //     MAX e.g. number as an unsigned number with a sign bit.
 //     Also besides a y percentage maybe we mult by y original range?
-// - make the pom like all the other projects
 // - deploy the project to maven central
 // - add to zorbage viewer
 // - compare results between zorbage viewer and some audio program
@@ -76,6 +76,29 @@ public class JAudio {
 	// do not instantiate
 	
 	private JAudio() { }
+
+	public static void main(String[] args) {
+		
+		if (args.length != 1) {
+			
+			System.out.println("must pass one WAV/AU/AIFF file name as a command line argument");
+			
+			System.exit(1);
+		}
+
+		DataBundle bundle = read(args[0]);
+		
+		if (bundle.bundle().size() == 0) {
+			
+			System.out.println("READ " + args[0]);
+			
+			System.exit(2);
+		}
+
+		System.out.println("COULD NOT READ " + args[0]);
+		
+		System.exit(0);
+	}
 
 	@SuppressWarnings("unchecked")
 	public static DataBundle read(String filename) {
@@ -247,29 +270,6 @@ public class JAudio {
 		}
 
 		return bundle;
-	}
-
-	public static void main(String[] args) {
-		
-		if (args.length != 1) {
-			
-			System.out.println("must pass one WAV/AU/AIFF file name as a command line argument");
-			
-			System.exit(1);
-		}
-
-		DataBundle bundle = read(args[0]);
-		
-		if (bundle.bundle().size() == 0) {
-			
-			System.out.println("file " + args[0] + " NOT read");
-			
-			System.exit(2);
-		}
-
-		System.out.println("file " + args[0] + " read");
-		
-		System.exit(0);
 	}
 
 	private static
