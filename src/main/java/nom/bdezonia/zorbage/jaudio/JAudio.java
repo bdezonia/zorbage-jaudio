@@ -119,7 +119,7 @@ public class JAudio {
 			
 			int numChannels = af.getChannels();
 
-			long[] dims = new long[] {numChannels, numFrames};
+			long[] dims = new long[] {numFrames, numChannels};
 			
 			// determine pixel type
 			
@@ -162,11 +162,11 @@ public class JAudio {
 			
 			for (long f = 0; f < numFrames; f++) {
 
-				idx.set(1, f);
+				idx.set(0, f);
 				
 				for (long c = 0; c < numChannels; c++) {
 					
-					idx.set(0, c);
+					idx.set(1, c);
 					
 					// determine how to read a value
 
@@ -437,17 +437,17 @@ public class JAudio {
 		data.setValueType("audio");
 		data.setValueUnit("amplitude");
 		
-		data.setAxisType(0, "channel");
-		data.setAxisUnit(0, "number");
-		
-		data.setAxisType(1, "time");
-		data.setAxisUnit(1, "seconds");
+		data.setAxisType(0, "time");
+		data.setAxisUnit(0, "seconds");
 
+		data.setAxisType(1, "channel");
+		data.setAxisUnit(1, "number");
+		
 		// set the scale of the time axis
 		
 		CoordinateSpace cs = new LinearNdCoordinateSpace(
-									new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO},
-									new BigDecimal[] {BigDecimal.valueOf(secondsPerFrame), BigDecimal.ONE});
+									new BigDecimal[] {BigDecimal.valueOf(secondsPerFrame), BigDecimal.ONE},
+									new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO});
 
 		data.setCoordinateSpace(cs);
 		
@@ -596,7 +596,7 @@ public class JAudio {
 		}
 		else if (encoding == Encoding.PCM_UNSIGNED) {
 
-			// unsigned 8 or 16 or 24 or 32 up to 64 bit
+			// unsigned 8 or 16 or 24 or 32 up to 128 bit
 			
 			if (bitsPerSample >= 1 && bitsPerSample <= 8) {
 				
