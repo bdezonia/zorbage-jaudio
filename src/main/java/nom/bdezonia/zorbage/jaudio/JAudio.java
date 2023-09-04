@@ -62,10 +62,6 @@ import nom.bdezonia.zorbage.type.real.float64.Float64Member;
 //     approach I am not taking. I am treating number as a fraction of
 //     MAX e.g. number as an unsigned number with a sign bit.
 //     Also besides a y percentage maybe we mult by y original range?
-// - deploy the project to maven central
-// - add to zorbage viewer
-// - compare results between zorbage viewer and some audio program
-//     using the same WAV files.
 
 // The java.sound spec supports WAV, AU, and AIFF file formats
 //   And various encodings of these formats
