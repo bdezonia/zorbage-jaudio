@@ -131,20 +131,20 @@ public class JAudio {
 			
 			DimensionedDataSource<?> data =
 					
-					allocateData(type, dims, 1.0/af.getFrameRate());
+					allocateData(filename, type, dims, 1.0/af.getFrameRate());
 			
 			boolean bigEndian = af.isBigEndian();
+			
+			IntegerIndex idx = new IntegerIndex(2);
+			
+			int bytesPerSample = bitsPerSample / 8 + (bitsPerSample % 8 == 0 ? 0 : 1);
 			
 			int frameSize = af.getFrameSize();
 			
 			if (frameSize == AudioSystem.NOT_SPECIFIED) {
 				
-				frameSize = 1;
+				frameSize = numChannels * bytesPerSample;
 			}
-			
-			IntegerIndex idx = new IntegerIndex(2);
-			
-			int bytesPerSample = bitsPerSample / 8 + (bitsPerSample % 8 == 0 ? 0 : 1);
 			
 			System.out.println("Frame size       = "+frameSize);
 			System.out.println("Num frames       = "+numFrames);
@@ -386,7 +386,7 @@ public class JAudio {
 	
 		DimensionedDataSource<?>
 	
-			allocateData(Object type, long[] dims, double secondsPerFrame)
+			allocateData(String filename, Object type, long[] dims, double secondsPerFrame)
 	{
 		// make multidim dataset with time and channels
 		
@@ -431,18 +431,23 @@ public class JAudio {
 		if (data == null) {
 			return null;
 		}
-		
-		data.setAxisType(0, "time");
-		data.setAxisUnit(0, "seconds");
 
-		data.setAxisType(1, "channel");
-		data.setAxisUnit(1, "number");
+		data.setSource(filename);
+		
+		data.setValueType("audio");
+		data.setValueUnit("amplitude");
+		
+		data.setAxisType(0, "channel");
+		data.setAxisUnit(0, "number");
+		
+		data.setAxisType(1, "time");
+		data.setAxisUnit(1, "seconds");
 
 		// set the scale of the time axis
 		
 		CoordinateSpace cs = new LinearNdCoordinateSpace(
-									new BigDecimal[] {BigDecimal.valueOf(secondsPerFrame), BigDecimal.ONE},
-									new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO});
+									new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO},
+									new BigDecimal[] {BigDecimal.valueOf(secondsPerFrame), BigDecimal.ONE});
 
 		data.setCoordinateSpace(cs);
 		
