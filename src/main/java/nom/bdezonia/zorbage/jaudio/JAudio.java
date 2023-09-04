@@ -23,10 +23,12 @@
  */
 package nom.bdezonia.zorbage.jaudio;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
@@ -86,12 +88,12 @@ public class JAudio {
 		
 		if (bundle.bundle().size() == 0) {
 			
-			System.out.println("READ " + args[0]);
+			System.out.println("COULD NOT READ " + args[0]);
 			
 			System.exit(2);
 		}
 
-		System.out.println("COULD NOT READ " + args[0]);
+		System.out.println("READ " + args[0]);
 		
 		System.exit(0);
 	}
@@ -106,6 +108,8 @@ public class JAudio {
 			File file = new File(filename);
 
 			AudioInputStream ais = AudioSystem.getAudioInputStream(file);
+			
+			BufferedInputStream bis = new BufferedInputStream(ais);
 
 			// determine dimensions
 			
@@ -135,8 +139,6 @@ public class JAudio {
 			
 			if (frameSize == AudioSystem.NOT_SPECIFIED) {
 				
-				System.out.println("Frame size could not be determined for given input file.");
-
 				frameSize = 1;
 			}
 			
@@ -144,10 +146,19 @@ public class JAudio {
 			
 			int bytesPerSample = bitsPerSample / 8 + (bitsPerSample % 8 == 0 ? 0 : 1);
 			
+			System.out.println("Frame size       = "+frameSize);
+			System.out.println("Num frames       = "+numFrames);
+			System.out.println("Num channels     = "+numChannels);
+			System.out.println("bits per sample  = "+bitsPerSample);
+			System.out.println("bytes per sample = "+bytesPerSample);
+			System.out.println("ENCODING         = "+encoding);
+			System.out.println("dims             = "+Arrays.toString(dims));
+
 			// iterate the file and set all the channels at each time point
 			//   to the pixels read at that time point in the file
 
-			byte[] bytes;
+			byte[] bytes = new byte[bytesPerSample];
+			byte[] reversedBytes = new byte[bytesPerSample];
 			
 			for (long f = 0; f < numFrames; f++) {
 
@@ -159,17 +170,17 @@ public class JAudio {
 					
 					// determine how to read a value
 
-					bytes = ais.readNBytes(frameSize);
+					bis.read(bytes);
 					
 					if (!bigEndian) {
 						
-						byte[] reversedBytes = new byte[bytes.length];
-
 						for (int b = 0; b < bytes.length; b++) {
 							reversedBytes[bytes.length-1-b] = bytes[b];
 						}
-						
-						bytes = reversedBytes;
+
+						for (int b = 0; b < bytes.length; b++) {
+							bytes[b] = reversedBytes[b];
+						}
 					}
 
 					// use metadata to correctly write the data to our structures
