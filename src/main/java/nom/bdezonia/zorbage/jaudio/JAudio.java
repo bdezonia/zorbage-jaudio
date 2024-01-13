@@ -26,8 +26,11 @@ package nom.bdezonia.zorbage.jaudio;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import javax.sound.sampled.AudioFormat;
@@ -98,16 +101,46 @@ public class JAudio {
 		System.exit(0);
 	}
 
+	/**
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public static
+	
+		DataBundle
+		
+			readAllDatasets(String filename)
+	{
+		try {
+		
+			URI uri = new URI("file", null, new File(filename).getAbsolutePath(), null);
+			
+			return readAllDatasets(uri);
+	
+		} catch (URISyntaxException e) {
+			
+			System.out.println("Bad name for file: "+e.getMessage());
+			
+			return new DataBundle();
+		}
+	}
+
+	/**
+	 * 
+	 * @param fileURI
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	public static DataBundle readAllDatasets(String filename) {
+	public static DataBundle readAllDatasets(URI fileURI) {
 
 		DataBundle bundle = new DataBundle();
 		
 		try {
 			
-			File file = new File(filename);
+			InputStream stream = fileURI.toURL().openStream();
 
-			AudioInputStream ais = AudioSystem.getAudioInputStream(file);
+			AudioInputStream ais = AudioSystem.getAudioInputStream(stream);
 			
 			BufferedInputStream bis = new BufferedInputStream(ais);
 
@@ -131,7 +164,7 @@ public class JAudio {
 			
 			DimensionedDataSource<?> data =
 					
-					allocateData(filename, type, dims, 1.0/af.getFrameRate());
+					allocateData(fileURI, type, dims, 1.0/af.getFrameRate());
 			
 			boolean bigEndian = af.isBigEndian();
 			
@@ -386,7 +419,7 @@ public class JAudio {
 	
 		DimensionedDataSource<?>
 	
-			allocateData(String filename, Object type, long[] dims, double secondsPerFrame)
+			allocateData(URI fileURI, Object type, long[] dims, double secondsPerFrame)
 	{
 		// make multidim dataset with time and channels
 		
@@ -432,7 +465,7 @@ public class JAudio {
 			return null;
 		}
 
-		data.setSource(filename);
+		data.setSource(fileURI.toString());
 		
 		data.setValueType("audio");
 		data.setValueUnit("amplitude");
