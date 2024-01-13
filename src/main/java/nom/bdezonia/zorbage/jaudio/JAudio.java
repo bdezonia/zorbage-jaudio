@@ -84,7 +84,7 @@ public class JAudio {
 			System.exit(1);
 		}
 
-		DataBundle bundle = read(args[0]);
+		DataBundle bundle = readAllDatasets(args[0]);
 		
 		if (bundle.bundle().size() == 0) {
 			
@@ -99,7 +99,7 @@ public class JAudio {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static DataBundle read(String filename) {
+	public static DataBundle readAllDatasets(String filename) {
 
 		DataBundle bundle = new DataBundle();
 		
