@@ -120,9 +120,7 @@ public class JAudio {
 	
 		} catch (URISyntaxException e) {
 			
-			System.out.println("Bad name for file: "+e.getMessage());
-			
-			return new DataBundle();
+			throw new IllegalArgumentException("Bad name for file: "+e.getMessage());
 		}
 	}
 
