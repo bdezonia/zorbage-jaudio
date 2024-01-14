@@ -405,12 +405,8 @@ public class JAudio {
 		}
 		else {
 			
-			System.out.print("Unknown encoding in audio file: "+encoding);
-			
-			System.exit(1);
+			throw new IllegalArgumentException("Unknown encoding in audio file: "+encoding);
 		}
-		
-		return null;
 	}
 
 	private static
