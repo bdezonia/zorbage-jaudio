@@ -39,6 +39,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import nom.bdezonia.zorbage.algebra.Allocatable;
 import nom.bdezonia.zorbage.algebra.G;
 import nom.bdezonia.zorbage.coordinates.CoordinateSpace;
 import nom.bdezonia.zorbage.coordinates.LinearNdCoordinateSpace;
@@ -158,7 +159,7 @@ public class JAudio {
 			
 			Encoding encoding = af.getEncoding();
 
-			Object type = findType(encoding, bitsPerSample);
+			Allocatable<?> type = findType(encoding, bitsPerSample);
 			
 			DimensionedDataSource<?> data =
 					
@@ -312,7 +313,7 @@ public class JAudio {
 
 	private static
 	
-		Object
+		Allocatable<?>
 		
 			findType(AudioFormat.Encoding encoding, int bitsPerSample)
 	{
@@ -413,52 +414,16 @@ public class JAudio {
 	
 		DimensionedDataSource<?>
 	
-			allocateData(URI fileURI, Object type, long[] dims, double secondsPerFrame)
+			allocateData(URI fileURI, Allocatable<?> type, long[] dims, double secondsPerFrame)
 	{
 		// make multidim dataset with time and channels
 		
-		DimensionedDataSource<?> data = null;
+		@SuppressWarnings({"rawtypes","unchecked"})
 		
-		if (type instanceof SignedInt8Member)
-			data = DimensionedStorage.allocate(G.INT8.construct(), dims);
+		DimensionedDataSource<?> data =
+				
+				DimensionedStorage.allocate((Allocatable) type, dims);
 		
-		if (type instanceof SignedInt16Member)
-			data = DimensionedStorage.allocate(G.INT16.construct(), dims);
-		
-		if (type instanceof SignedInt32Member)
-			data = DimensionedStorage.allocate(G.INT32.construct(), dims);
-		
-		if (type instanceof SignedInt64Member)
-			data = DimensionedStorage.allocate(G.INT64.construct(), dims);
-		
-		if (type instanceof SignedInt128Member)
-			data = DimensionedStorage.allocate(G.INT128.construct(), dims);
-		
-		if (type instanceof UnsignedInt8Member)
-			data = DimensionedStorage.allocate(G.UINT8.construct(), dims);
-		
-		if (type instanceof UnsignedInt16Member)
-			data = DimensionedStorage.allocate(G.UINT16.construct(), dims);
-		
-		if (type instanceof UnsignedInt32Member)
-			data = DimensionedStorage.allocate(G.UINT32.construct(), dims);
-		
-		if (type instanceof UnsignedInt64Member)
-			data = DimensionedStorage.allocate(G.UINT64.construct(), dims);
-		
-		if (type instanceof UnsignedInt128Member)
-			data = DimensionedStorage.allocate(G.UINT128.construct(), dims);
-		
-		if (type instanceof Float32Member)
-			data = DimensionedStorage.allocate(G.FLT.construct(), dims);
-		
-		if (type instanceof Float64Member)
-			data = DimensionedStorage.allocate(G.DBL.construct(), dims);
-		
-		if (data == null) {
-			return null;
-		}
-
 		data.setSource(fileURI.toString());
 		
 		data.setValueType("audio");
@@ -706,9 +671,7 @@ public class JAudio {
 		}
 		else {
 			
-			System.out.print("Unknown encoding in audio file: "+encoding);
-			
-			System.exit(1);
+			throw new IllegalArgumentException("Unknown encoding in audio file: "+encoding);
 		}
 	}
 }
