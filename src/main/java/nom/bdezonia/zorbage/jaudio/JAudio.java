@@ -223,11 +223,11 @@ public class JAudio {
 
 			// store some metadata
 			
-			data.metadata().putLong("number of channels", numChannels);
+			data.metadata().putInt("number of channels", numChannels);
 			
 			data.metadata().putLong("number of frames", numFrames);
 			
-			data.metadata().putLong("frameSize", frameSize);
+			data.metadata().putInt("frameSize", frameSize);
 			
 			data.metadata().putInt("bits per sample", bitsPerSample);
 
