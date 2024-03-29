@@ -1,0 +1,29 @@
+zorbage-jaudio
+
+This repository contains code for loading Java Audio file formats into zorbage
+structures for further processing.
+
+Currently supported file types include:
+
+  - AU
+  - AIFF 
+  - WAV
+
+To learn more about Zorbage please visit https://github.com/bdezonia/zorbage
+
+How to include zorbage-jaudio in your Maven project
+
+  Add the following dependency to your project's pom.xml:
+
+  <dependency>
+    <groupId>io.github.bdezonia</groupId>
+    <artifactId>zorbage-jaudio</artifactId>
+    <version>0.0.5</version>
+  </dependency>
+
+How to include zorbage-jaudio in a different build system
+
+  See https://search.maven.org/artifact/io.github.bdezonia/zorbage-jaudio/0.0.5/jar
+  for instructions on how to reference zorbage-netcdf in build systems such as
+  Gradle or others.
+
