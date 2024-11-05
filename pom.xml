@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.bdezonia</groupId>
   <artifactId>zorbage-jaudio</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8-SNAPSHOT</version>
   <name>zorbage-jaudio</name>
   <description>code for loading java audio library data into zorbage for further processing</description>
   <url>https://github.com/bdezonia/zorbage-jaudio</url>
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>io.github.bdezonia</groupId>
       <artifactId>zorbage</artifactId>
-      <version>2.0.4.7</version>
+      <version>2.0.5-SNAPSHOT</version>
     </dependency>
   
   </dependencies>
