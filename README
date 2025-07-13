@@ -18,12 +18,12 @@ How to include zorbage-jaudio in your Maven project
   <dependency>
     <groupId>io.github.bdezonia</groupId>
     <artifactId>zorbage-jaudio</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.8</version>
   </dependency>
 
 How to include zorbage-jaudio in a different build system
 
-  See https://search.maven.org/artifact/io.github.bdezonia/zorbage-jaudio/0.0.7/jar
+  See https://search.maven.org/artifact/io.github.bdezonia/zorbage-jaudio/0.0.8/jar
   for instructions on how to reference zorbage-netcdf in build systems such as
   Gradle or others.
 
