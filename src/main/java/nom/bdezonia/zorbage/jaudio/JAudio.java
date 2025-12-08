@@ -1,7 +1,7 @@
 /*
  * zorbage-jaudio: code for using the java sound api to open audio files into zorbage data structures for further processing
  *
- * Copyright (C) 2023 Barry DeZonia
+ * Copyright (C) 2023-2026 Barry DeZonia
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
